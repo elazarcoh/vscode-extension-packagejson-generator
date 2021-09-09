@@ -31,7 +31,7 @@ export interface Config {
 update-package-json --file 'vscode-extension-config.json'
 ```
 
-The input JSON file should look like this:
+The input JSON file may look like this:
 
 ```json
 {
@@ -83,7 +83,7 @@ or with object as the config
 }
 ```
 
-### Bonus - accessing configuration in code helper
+### Bonus - accessing configuration from code utility
 
 ```ts
 import { configUtils } from 'vscode-extensions-json-generator/utils';
