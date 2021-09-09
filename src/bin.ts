@@ -1,10 +1,7 @@
 import { Command } from 'commander';
 import * as fs from 'fs/promises';
 import { GeneratingConfiguration, PackageJson } from './types';
-import {
-  createConfigurationObject,
-  DEFAULT_TAGS,
-} from './vscode-extension-config';
+import { createConfigurationObject } from './vscode-extension-config';
 
 class InvalidProperty extends Error {
   constructor(properyName?: string, message?: string) {
@@ -19,7 +16,7 @@ async function run(inputFile: string): Promise<void> {
     prefix,
     targetFile = 'package.json',
     tsconfig = undefined,
-    tags = DEFAULT_TAGS,
+    tags,
     sort = true,
   }: GeneratingConfiguration = JSON.parse(await fs.readFile(inputFile, 'utf8'));
 

@@ -12,8 +12,8 @@ export interface ConfigEntry {
 export interface GeneratingConfiguration {
   configurations: ConfigEntry[];
   prefix: string;
-  targetFile: string;
+  targetFile?: string;
   tsconfig?: string;
-  tags: string[];
-  sort: boolean;
+  tags?: string[];
+  sort?: boolean;
 }

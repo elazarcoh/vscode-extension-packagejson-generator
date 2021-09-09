@@ -1,11 +1,11 @@
 import { Compilation, Compiler } from 'webpack';
-// import { validate } from 'schema-utils';
 import {
   createConfigurationObject,
-  DEFAULT_TAGS,
+  validateInputConfig,
 } from '../vscode-extension-config';
 import * as fs from 'fs/promises';
 import { GeneratingConfiguration, PackageJson } from '../types';
+import { defaultConfig } from '../defaults';
 
 // for some reason I can't import it from webpack
 type WebpackLogger = ReturnType<Compilation['getLogger']>;
@@ -17,10 +17,9 @@ class InvalidProperty extends Error {
     super(message || `property ${properyName} is invalid or not defined`);
   }
 }
-
 export class VSCodeExtensionsPackageJsonGenerator {
   private readonly definitionsFile: string | undefined;
-  private definitions: GeneratingConfiguration | undefined;
+  private definitions: Required<GeneratingConfiguration> | undefined;
   private needsUpdate: boolean = false;
   private logger: WebpackLogger | typeof console = console;
 
@@ -30,7 +29,8 @@ export class VSCodeExtensionsPackageJsonGenerator {
     if (typeof obj == 'string') {
       this.definitionsFile = obj;
     } else {
-      this.definitions = obj;
+      validateInputConfig(obj);
+      this.definitions = { ...defaultConfig, ...obj };
     }
   }
 
@@ -38,9 +38,11 @@ export class VSCodeExtensionsPackageJsonGenerator {
     obj: VSCodeExtensionsPackageJsonGenerator
   ) {
     if (obj.definitionsFile) {
-      obj.definitions = JSON.parse(
+      const definitions = JSON.parse(
         await fs.readFile(obj.definitionsFile, 'utf8')
       );
+      validateInputConfig(definitions);
+      obj.definitions = { ...defaultConfig, ...definitions };
 
       if (obj.definitions === undefined)
         throw new Error(
@@ -66,14 +68,8 @@ export class VSCodeExtensionsPackageJsonGenerator {
     obj: VSCodeExtensionsPackageJsonGenerator
   ) {
     if (obj.needsUpdate && obj.definitions !== undefined) {
-      const {
-        configurations,
-        prefix,
-        targetFile = 'package.json',
-        tsconfig,
-        tags = DEFAULT_TAGS,
-        sort = true,
-      } = obj.definitions;
+      const { configurations, prefix, targetFile, tsconfig, tags, sort } =
+        obj.definitions;
 
       const nextConfig = createConfigurationObject(
         prefix,

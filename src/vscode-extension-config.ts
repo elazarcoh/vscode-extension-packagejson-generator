@@ -1,6 +1,7 @@
 import deepEqual from 'deep-equal';
-import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
+import { JSONSchema7, JSONSchema7Definition, validate } from 'json-schema';
 import { createGenerator } from 'ts-json-schema-generator';
+import { DEFAULT_TAGS } from './defaults';
 
 function copyProperty(
   current: JSONSchema7Definition | undefined,
@@ -107,11 +108,49 @@ export function createConfigurationObject(
   return { properties: sort ? sortObject(properties) : properties };
 }
 
-export const DEFAULT_TAGS = [
-  'markdownDescription',
-  'scope',
-  'patternErrorMessage',
-  'deprecationMessage',
-  'enumDescriptions',
-  'deprecated',
-];
+export function validateInputConfig(options: any) {
+  const schema: JSONSchema7 = {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    additionalProperties: false,
+    definitions: {},
+    properties: {
+      configurations: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            filePath: {
+              type: 'string',
+            },
+            name: {
+              type: 'string',
+            },
+          },
+          required: ['filePath', 'name'],
+          type: 'object',
+        },
+        type: 'array',
+      },
+      prefix: {
+        type: 'string',
+      },
+      sort: {
+        type: 'boolean',
+      },
+      tags: {
+        items: {
+          type: 'string',
+        },
+        type: 'array',
+      },
+      targetFile: {
+        type: 'string',
+      },
+      tsconfig: {
+        type: 'string',
+      },
+    },
+    required: ['configurations', 'prefix'],
+    type: 'object',
+  };
+  validate(schema, options);
+}
