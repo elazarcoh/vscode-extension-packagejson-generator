@@ -3,9 +3,9 @@ import { Compilation, Compiler } from 'webpack';
 import {
   createConfigurationObject,
   DEFAULT_TAGS,
-} from './vscode-extension-config';
+} from '../vscode-extension-config';
 import * as fs from 'fs/promises';
-import { GeneratingConfiguration, PackageJson } from './types';
+import { GeneratingConfiguration, PackageJson } from '../types';
 
 // for some reason I can't import it from webpack
 type WebpackLogger = ReturnType<Compilation['getLogger']>;

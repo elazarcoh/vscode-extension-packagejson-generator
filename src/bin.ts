@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import * as fs from 'fs/promises';
+import { GeneratingConfiguration, PackageJson } from './types';
 import {
   createConfigurationObject,
   DEFAULT_TAGS,

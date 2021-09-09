@@ -4,11 +4,21 @@
   "module": "dist/vscode-extensions-json-generator.esm.js",
   "version": "0.1.0",
   "license": "MIT",
-  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*/index.js"
+  },
   "bin": {
     "update-package-json": "./bin.js"
   },
-  "typings": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*",
+        "dist/*/index.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist",
     "src"
@@ -43,7 +53,7 @@
     "typescript": "^4.4.2"
   },
   "dependencies": {
-    "@types/vscode": "^1.60.0",
+    "@types/vscode": "^1.59.0",
     "commander": "^8.1.0",
     "deep-equal": "^2.0.5",
     "ts-json-schema-generator": "^0.95.0"
