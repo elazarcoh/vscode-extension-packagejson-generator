@@ -1,0 +1,22 @@
+{
+  // see https://www.typescriptlang.org/tsconfig to better understand tsconfigs
+  "include": [
+    "src",
+    "types"
+  ],
+  "compilerOptions": {
+    "module": "CommonJS",
+    "lib": [
+      "ES2019"
+    ],
+    "declaration": true,
+    "strictNullChecks": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "rootDir": "src"
+  }
+}
