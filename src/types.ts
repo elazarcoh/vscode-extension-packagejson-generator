@@ -1,15 +1,15 @@
-interface PackageJson {
+export interface PackageJson {
   contributes: {
     configuration: { [key: string]: any };
   };
 }
 
-interface ConfigEntry {
+export interface ConfigEntry {
   filePath: string;
   name: string;
 }
 
-interface GeneratingConfiguration {
+export interface GeneratingConfiguration {
   configurations: ConfigEntry[];
   prefix: string;
   targetFile: string;
