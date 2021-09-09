@@ -133,7 +133,7 @@ export class VSCodeExtensionsPackageJsonGenerator {
     });
 
     compiler.hooks.afterPlugins.tap(PLUGIN, async () => {
-      if (thisObj.definitionsFile) {
+      if (compiler.watchMode && thisObj.definitionsFile) {
         const watcher = fs.watch(thisObj.definitionsFile);
         for await (const event of watcher) {
           if (event.eventType === 'change') {
