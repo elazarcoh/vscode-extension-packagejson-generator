@@ -1,3 +1,4 @@
+import { JTDDataType, JTDSchemaType } from 'ajv/dist/jtd';
 export interface PackageJson {
   contributes: {
     configuration: { [key: string]: any };

@@ -1,16 +1,15 @@
 import { Command } from 'commander';
 import * as fs from 'fs/promises';
 import { GeneratingConfiguration, PackageJson } from './types';
-import { createConfigurationObject } from './vscode-extension-config';
-
-class InvalidProperty extends Error {
-  constructor(properyName?: string, message?: string) {
-    super(message || `property ${properyName} is invalid or not defined`);
-  }
-}
+import {
+  createConfigurationObject,
+  validateInputConfig,
+} from './vscode-extension-config';
 
 async function run(inputFile: string): Promise<void> {
   console.log(`reading input from "${inputFile}"`);
+  const config = JSON.parse(await fs.readFile(inputFile, 'utf8'));
+  validateInputConfig(config);
   const {
     configurations,
     prefix,
@@ -18,14 +17,7 @@ async function run(inputFile: string): Promise<void> {
     tsconfig = undefined,
     tags,
     sort = true,
-  }: GeneratingConfiguration = JSON.parse(await fs.readFile(inputFile, 'utf8'));
-
-  if (configurations === undefined || typeof configurations !== 'object') {
-    throw new InvalidProperty('configurations');
-  }
-  if (prefix === undefined || typeof prefix !== 'string') {
-    throw new InvalidProperty('prefix');
-  }
+  } = config;
 
   const nextConfig = createConfigurationObject(
     prefix,

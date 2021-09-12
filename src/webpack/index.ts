@@ -12,11 +12,6 @@ type WebpackLogger = ReturnType<Compilation['getLogger']>;
 
 const PLUGIN = 'VSCode Extension Config Generator';
 
-class InvalidProperty extends Error {
-  constructor(properyName?: string, message?: string) {
-    super(message || `property ${properyName} is invalid or not defined`);
-  }
-}
 export class VSCodeExtensionsPackageJsonGenerator {
   private readonly definitionsFile: string | undefined;
   private definitions: Required<GeneratingConfiguration> | undefined;
@@ -29,7 +24,11 @@ export class VSCodeExtensionsPackageJsonGenerator {
     if (typeof obj == 'string') {
       this.definitionsFile = obj;
     } else {
-      validateInputConfig(obj);
+      const valid = validateInputConfig(obj);
+      if (!valid) {
+        obj.logger.error(`invalid input webpack config object`);
+        throw new Error('invalid input webpack config object');
+      }
       this.definitions = { ...defaultConfig, ...obj };
     }
   }
@@ -41,26 +40,15 @@ export class VSCodeExtensionsPackageJsonGenerator {
       const definitions = JSON.parse(
         await fs.readFile(obj.definitionsFile, 'utf8')
       );
-      validateInputConfig(definitions);
-      obj.definitions = { ...defaultConfig, ...definitions };
-
-      if (obj.definitions === undefined)
-        throw new Error(
-          `could not read definitions file ${obj.definitionsFile}`
+      const valid = validateInputConfig(definitions);
+      if (!valid) {
+        obj.logger.error(
+          `error reading definition file ${obj.definitionsFile}`
         );
-
-      if (
-        obj.definitions.configurations === undefined ||
-        typeof obj.definitions.configurations !== 'object'
-      ) {
-        throw new InvalidProperty('configurations');
+        obj.needsUpdate = false;
+        return;
       }
-      if (
-        obj.definitions.prefix === undefined ||
-        typeof obj.definitions.prefix !== 'string'
-      ) {
-        throw new InvalidProperty('prefix');
-      }
+      obj.definitions = { ...defaultConfig, ...definitions };
     }
   }
 

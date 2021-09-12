@@ -1,4 +1,4 @@
-import { GeneratingConfiguration } from './types';
+import type { GeneratingConfiguration } from './types';
 
 export const DEFAULT_TAGS = [
   'markdownDescription',
