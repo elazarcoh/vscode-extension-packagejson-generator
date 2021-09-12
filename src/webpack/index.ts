@@ -1,22 +1,14 @@
 import { Compilation, Compiler } from 'webpack';
-import {
-  createConfigurationObject,
-  validateInputConfig,
-} from '../vscode-extension-config';
+import { createConfigurationObject } from '../vscode-extension-config';
 import * as fs from 'fs/promises';
 import { GeneratingConfiguration, PackageJson } from '../types';
 import { defaultConfig } from '../defaults';
-
-// for some reason I can't import it from webpack
+import JSON5 from 'json5';
+import { validateInputConfig } from '../validate-input-configuration';
 type WebpackLogger = ReturnType<Compilation['getLogger']>;
 
 const PLUGIN = 'VSCode Extension Config Generator';
 
-class InvalidProperty extends Error {
-  constructor(properyName?: string, message?: string) {
-    super(message || `property ${properyName} is invalid or not defined`);
-  }
-}
 export class VSCodeExtensionsPackageJsonGenerator {
   private readonly definitionsFile: string | undefined;
   private definitions: Required<GeneratingConfiguration> | undefined;
@@ -29,7 +21,12 @@ export class VSCodeExtensionsPackageJsonGenerator {
     if (typeof obj == 'string') {
       this.definitionsFile = obj;
     } else {
-      validateInputConfig(obj);
+      const validOrError = validateInputConfig(obj);
+      if (validOrError !== true) {
+        obj.logger.error(`invalid input webpack config object`);
+        obj.logger.error(validOrError);
+        throw new Error('invalid input webpack config object');
+      }
       this.definitions = { ...defaultConfig, ...obj };
     }
   }
@@ -37,31 +34,20 @@ export class VSCodeExtensionsPackageJsonGenerator {
   private static async readDefinitions(
     obj: VSCodeExtensionsPackageJsonGenerator
   ) {
-    if (obj.definitionsFile) {
-      const definitions = JSON.parse(
-        await fs.readFile(obj.definitionsFile, 'utf8')
-      );
-      validateInputConfig(definitions);
-      obj.definitions = { ...defaultConfig, ...definitions };
-
-      if (obj.definitions === undefined)
-        throw new Error(
-          `could not read definitions file ${obj.definitionsFile}`
-        );
-
-      if (
-        obj.definitions.configurations === undefined ||
-        typeof obj.definitions.configurations !== 'object'
-      ) {
-        throw new InvalidProperty('configurations');
-      }
-      if (
-        obj.definitions.prefix === undefined ||
-        typeof obj.definitions.prefix !== 'string'
-      ) {
-        throw new InvalidProperty('prefix');
-      }
+    if (!obj.definitionsFile) {
+      return false;
     }
+    const definitions = JSON5.parse(
+      await fs.readFile(obj.definitionsFile, 'utf8')
+    );
+    const validOrErrors = validateInputConfig(definitions);
+    if (validOrErrors !== true) {
+      obj.logger.error(`error reading definition file ${obj.definitionsFile}`);
+      obj.logger.error(validOrErrors);
+      return false;
+    }
+    obj.definitions = { ...defaultConfig, ...definitions };
+    return true;
   }
 
   private static async updatePackageJson(
@@ -82,7 +68,7 @@ export class VSCodeExtensionsPackageJsonGenerator {
       const packageJson: PackageJson = JSON.parse(
         await fs.readFile(targetFile, 'utf8')
       );
-      // make sure contibutes.configuration is defined
+      // make sure contributes.configuration is defined
       if (packageJson.contributes?.configuration === undefined) {
         if (packageJson.contributes === undefined)
           packageJson.contributes = { configuration: {} };
@@ -110,8 +96,8 @@ export class VSCodeExtensionsPackageJsonGenerator {
 
     const updateDefinitions = async () => {
       try {
-        await VSCodeExtensionsPackageJsonGenerator.readDefinitions(thisObj);
-        thisObj.needsUpdate = true;
+        thisObj.needsUpdate =
+          await VSCodeExtensionsPackageJsonGenerator.readDefinitions(thisObj);
         await updatePackageJson();
       } catch (err: any) {
         thisObj.logger.error(`error in ${thisObj.definitionsFile}`);
@@ -132,9 +118,12 @@ export class VSCodeExtensionsPackageJsonGenerator {
       await updateDefinitions();
     });
 
-    compiler.hooks.afterPlugins.tap(PLUGIN, async () => {
-      if (compiler.watchMode && thisObj.definitionsFile) {
-        const watcher = fs.watch(thisObj.definitionsFile);
+    // here I wanted to use the compiler.watchMode flag, but it seems to be `false`
+    // in all hooks before starting the compilation, so I resolved to use the watchRun hook.
+    let watcher: ReturnType<typeof fs.watch> | undefined;
+    compiler.hooks.watchRun.tap(PLUGIN, async () => {
+      if (!watcher && thisObj.definitionsFile) {
+        watcher = fs.watch(thisObj.definitionsFile);
         for await (const event of watcher) {
           if (event.eventType === 'change') {
             await updateDefinitions();

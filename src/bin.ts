@@ -1,16 +1,18 @@
 import { Command } from 'commander';
 import * as fs from 'fs/promises';
-import { GeneratingConfiguration, PackageJson } from './types';
+import { PackageJson } from './types';
+import { validateInputConfig } from './validate-input-configuration';
 import { createConfigurationObject } from './vscode-extension-config';
-
-class InvalidProperty extends Error {
-  constructor(properyName?: string, message?: string) {
-    super(message || `property ${properyName} is invalid or not defined`);
-  }
-}
+import JSON5 from 'json5';
 
 async function run(inputFile: string): Promise<void> {
-  console.log(`reading input from "${inputFile}"`);
+  console.info(`reading input from "${inputFile}"`);
+  const config = JSON5.parse(await fs.readFile(inputFile, 'utf8'));
+  const validOrError = validateInputConfig(config);
+  if (validOrError !== true) {
+    console.error(validOrError);
+    return;
+  }
   const {
     configurations,
     prefix,
@@ -18,14 +20,7 @@ async function run(inputFile: string): Promise<void> {
     tsconfig = undefined,
     tags,
     sort = true,
-  }: GeneratingConfiguration = JSON.parse(await fs.readFile(inputFile, 'utf8'));
-
-  if (configurations === undefined || typeof configurations !== 'object') {
-    throw new InvalidProperty('configurations');
-  }
-  if (prefix === undefined || typeof prefix !== 'string') {
-    throw new InvalidProperty('prefix');
-  }
+  } = config;
 
   const nextConfig = createConfigurationObject(
     prefix,
@@ -38,7 +33,7 @@ async function run(inputFile: string): Promise<void> {
   const packageJson: PackageJson = JSON.parse(
     await fs.readFile(targetFile, 'utf8')
   );
-  // make sure contibutes.configuration is defined
+  // make sure contributes.configuration is defined
   if (packageJson.contributes?.configuration === undefined) {
     if (packageJson.contributes === undefined)
       packageJson.contributes = { configuration: {} };
@@ -50,7 +45,7 @@ async function run(inputFile: string): Promise<void> {
     packageJson.contributes.configuration[key] = value;
   }
 
-  console.log(`writing updated json to "${targetFile}"`);
+  console.info(`writing updated json to "${targetFile}"`);
   await fs.writeFile(
     targetFile,
     JSON.stringify(packageJson, undefined, 2).concat('\n')
