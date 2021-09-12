@@ -42,7 +42,6 @@
     "trailingComma": "es5"
   },
   "devDependencies": {
-    "@types/ajv": "^1.0.0",
     "@types/commander": "^2.12.2",
     "@types/deep-equal": "^1.0.1",
     "@types/json-schema": "^7.0.8",
@@ -53,12 +52,14 @@
     "typescript": "^4.4.2"
   },
   "dependencies": {
-    "ajv": "^8.6.2",
+    "@stoplight/better-ajv-errors": "^0.2.0",
+    "ajv": "^8.6.3",
     "commander": "^8.1.0",
     "deep-equal": "^2.0.5",
+    "json5": "^2.2.0",
     "ts-json-schema-generator": "^0.95.0"
   },
   "peerDependencies": {
-    "@types/vscode": "^1.60.0"
+    "webpack": "^5.52.1"
   }
 }
