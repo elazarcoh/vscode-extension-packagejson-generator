@@ -112,7 +112,7 @@ describe('vscode-extension', () => {
     assert(valid, errors.map((e) => e.error).join('\n'));
   }).timeout(10000);
 
-  xstep('should be able to compile', async () => {
+  step('should be able to compile', async () => {
     console.info(`writing updated json to "${packageJsonResultPath}"`);
     await fs.writeFile(
       packageJsonResultPath,
@@ -130,7 +130,7 @@ describe('vscode-extension', () => {
       const extensionDevelopmentPath = path.resolve(relativePath('.'));
 
       const extensionTestsPath = path.resolve(
-        relativePath('test/suite/index'),
+        relativePath('out/test'),
         './suite/index'
       );
 
