@@ -11,7 +11,7 @@ export const DEFAULT_TAGS = [
 
 export const defaultConfig: Omit<
   Required<GeneratingConfiguration>,
-  'configurations' | 'prefix'
+  'configurations' | 'prefix' | 'templateFile'
 > = {
   sort: true,
   tags: DEFAULT_TAGS,

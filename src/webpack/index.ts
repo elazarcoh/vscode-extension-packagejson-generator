@@ -54,8 +54,15 @@ export class VSCodeExtensionsPackageJsonGenerator {
     obj: VSCodeExtensionsPackageJsonGenerator
   ) {
     if (obj.needsUpdate && obj.definitions !== undefined) {
-      const { configurations, prefix, targetFile, tsconfig, tags, sort } =
-        obj.definitions;
+      const {
+        configurations,
+        prefix,
+        templateFile,
+        targetFile,
+        tsconfig,
+        tags,
+        sort,
+      } = obj.definitions;
 
       const nextConfig = createConfigurationObject(
         prefix,
@@ -66,7 +73,7 @@ export class VSCodeExtensionsPackageJsonGenerator {
       );
 
       const packageJson: PackageJson = JSON.parse(
-        await fs.readFile(targetFile, 'utf8')
+        await fs.readFile(templateFile ?? targetFile, 'utf8')
       );
       // make sure contributes.configuration is defined
       if (packageJson.contributes?.configuration === undefined) {

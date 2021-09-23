@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import * as fs from 'fs/promises';
-import { PackageJson } from './types';
+import { GeneratingConfiguration, PackageJson } from './types';
 import { validateInputConfig } from './validate-input-configuration';
 import { createConfigurationObject } from './vscode-extension-config';
 import JSON5 from 'json5';
@@ -16,11 +16,12 @@ async function run(inputFile: string): Promise<void> {
   const {
     configurations,
     prefix,
+    templateFile,
     targetFile = 'package.json',
     tsconfig = undefined,
     tags,
     sort = true,
-  } = config;
+  } = config as GeneratingConfiguration;
 
   const nextConfig = createConfigurationObject(
     prefix,
@@ -31,7 +32,7 @@ async function run(inputFile: string): Promise<void> {
   );
 
   const packageJson: PackageJson = JSON.parse(
-    await fs.readFile(targetFile, 'utf8')
+    await fs.readFile(templateFile ?? targetFile, 'utf8')
   );
   // make sure contributes.configuration is defined
   if (packageJson.contributes?.configuration === undefined) {
