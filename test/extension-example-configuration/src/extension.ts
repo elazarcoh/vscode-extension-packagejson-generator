@@ -239,22 +239,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  let statusSizeDisposable: vscode.Disposable;
   // Example: Reading language overridable configuration for a document
   context.subscriptions.push(
-    vscode.workspace.onDidOpenTextDocument((e) => {
-      if (statusSizeDisposable) {
-        statusSizeDisposable.dispose();
-      }
+    vscode.workspace.onDidOpenTextDocument(async (e) => {
+      const showSize = configurations.get('language.showSize', e);
 
-      // 1) Check if showing size is configured for current file
-      const showSize: any = configurations.get('language.showSize', e);
-
-      // 3) If matches, insert empty last line
       if (showSize) {
-        statusSizeDisposable = vscode.window.setStatusBarMessage(
-          `${e.getText().length}`
-        );
+        await vscode.window.showInformationMessage(`${e.getText().length}`);
       }
     })
   );

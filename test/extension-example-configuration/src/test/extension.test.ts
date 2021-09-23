@@ -17,14 +17,56 @@ suite('Extension Test Suite', () => {
 
   vscode.window.showInformationMessage('Start all tests.');
 
-  test('Sample test', () => {
+  test('test getter', () => {
     const uri = testFile('a.py');
-    const config = 'resource.insertEmptyLastLine';
-    const withLib: any = configurations.get(config, uri);
-    const withVscode: any = vscode.workspace
+    const config: keyof Config = 'resource.insertEmptyLastLine';
+    const withLib = configurations.get(config, uri);
+    const withVscode = vscode.workspace
       .getConfiguration('', uri)
       .get(`${section}.${config}`);
 
     assert.deepStrictEqual(withLib, withVscode);
+  });
+
+  test('test update (no scope)', async () => {
+    const config: keyof Config = 'language.showSize';
+    const languageId = 'python';
+    const scope = undefined;
+    const newValue = true;
+
+    await configurations.update(
+      'language.showSize',
+      newValue,
+      scope,
+      false,
+      true
+    );
+
+    const withVscode = vscode.workspace
+      .getConfiguration('', scope)
+      .get(`${section}.${config}`);
+
+    assert.strictEqual(newValue, withVscode);
+  });
+
+  test('test update (with scope)', async () => {
+    const config: keyof Config = 'language.showSize';
+    const languageId = 'python';
+    const scope = { languageId: languageId };
+    const newValue = true;
+
+    await configurations.update(
+      'language.showSize',
+      newValue,
+      scope,
+      false,
+      true
+    );
+
+    const withVscode = vscode.workspace
+      .getConfiguration('', scope)
+      .get(`${section}.${config}`);
+
+    assert.strictEqual(newValue, withVscode);
   });
 });

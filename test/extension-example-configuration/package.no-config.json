@@ -17,9 +17,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:config.commands.configureViewOnWindowOpen",
-		"onCommand:config.commands.configureEmptyLastLineCurrentFile",
-		"onCommand:config.commands.configureEmptyLastLineFiles"
+		"*"
 	],
 	"main": "./out/extension",
 	"keywords": [
