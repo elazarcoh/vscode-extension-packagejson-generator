@@ -1,27 +1,37 @@
 import { Command } from 'commander';
 import * as fs from 'fs/promises';
 import { GeneratingConfiguration, PackageJson } from './types';
-import { validateInputConfig } from './validate-input-configuration';
+import {
+  InvalidConfigurationError,
+  readGeneratingConfiguration,
+  validateInputConfig,
+} from './input-configuration-helper';
 import { createConfigurationObject } from './vscode-extension-config';
 import JSON5 from 'json5';
 
 async function run(inputFile: string): Promise<void> {
   console.info(`reading input from "${inputFile}"`);
-  const config = JSON5.parse(await fs.readFile(inputFile, 'utf8'));
-  const validOrError = validateInputConfig(config);
-  if (validOrError !== true) {
-    console.error(validOrError);
+  let config;
+  try {
+    config = await readGeneratingConfiguration(inputFile);
+  } catch (err) {
+    if (err instanceof InvalidConfigurationError) {
+      console.error(err.validationErrors);
+    } else {
+      console.error(err);
+    }
     return;
   }
+
   const {
     configurations,
     prefix,
     templateFile,
-    targetFile = 'package.json',
-    tsconfig = undefined,
+    targetFile,
+    tsconfig,
     tags,
-    sort = true,
-  } = config as GeneratingConfiguration;
+    sort,
+  } = config;
 
   const nextConfig = createConfigurationObject(
     prefix,
@@ -32,7 +42,7 @@ async function run(inputFile: string): Promise<void> {
   );
 
   const packageJson: PackageJson = JSON.parse(
-    await fs.readFile(templateFile ?? targetFile, 'utf8')
+    await fs.readFile(templateFile, 'utf8')
   );
   // make sure contributes.configuration is defined
   if (packageJson.contributes?.configuration === undefined) {

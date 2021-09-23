@@ -9,6 +9,7 @@ import type { JSONSchema7 } from 'json-schema';
 import type { GeneratingConfiguration, PackageJson } from '../src/types';
 import { createConfigurationObject } from '../src/vscode-extension-config';
 import { DEFAULT_TAGS } from '../src/defaults';
+import { exists, extensionPath } from './test-utils';
 
 let extensionsSchema: JSONSchema7;
 before(async function () {
@@ -63,20 +64,11 @@ function validator() {
   return validate;
 }
 
-async function exists(path: string): Promise<boolean> {
-  return fs
-    .access(path)
-    .then((_) => true)
-    .catch((_) => false);
-}
+xdescribe('vscode-extension', () => {
+  const relativeToExtension = (path: string) => `${extensionPath}/${path}`;
 
-describe('vscode-extension', () => {
-  const extensionPath =
-    'D:/elazar/private/vscode-extension-config/test/extension-example-configuration/';
-  const relativePath = (path: string) => `${extensionPath}/${path}`;
-
-  const packageJsonResultPath = relativePath('package.json');
-  const vsixResultPath = relativePath('configuration-sample-0.0.1.vsix');
+  const packageJsonResultPath = relativeToExtension('package.json');
+  const vsixResultPath = relativeToExtension('configuration-sample-0.0.1.vsix');
 
   let packageJson: PackageJson;
 
@@ -85,13 +77,13 @@ describe('vscode-extension', () => {
     packageJson = await updatePackageJson({
       configurations: [
         {
-          filePath: relativePath('src/config.ts'),
+          filePath: relativeToExtension('src/config.ts'),
           name: 'Config',
         },
       ],
       prefix: 'conf',
-      targetFile: relativePath('package.no-config.json'),
-      tsconfig: relativePath('tsconfig.json'),
+      targetFile: relativeToExtension('package.no-config.json'),
+      tsconfig: relativeToExtension('tsconfig.json'),
       tags: DEFAULT_TAGS,
     });
   });
@@ -99,7 +91,7 @@ describe('vscode-extension', () => {
   after('vscode-extension', async function () {
     this.timeout(10000);
     if (await exists(vsixResultPath)) fs.unlink(vsixResultPath);
-    // if (await exists(packageJsonResultPath)) fs.unlink(packageJsonResultPath);
+    if (await exists(packageJsonResultPath)) fs.unlink(packageJsonResultPath);
   });
 
   xstep('should be a valid package.json for extensions', async () => {
@@ -119,7 +111,7 @@ describe('vscode-extension', () => {
       JSON.stringify(packageJson, undefined, 2).concat('\n')
     );
     await createVSIX({
-      cwd: relativePath('.'),
+      cwd: relativeToExtension('.'),
     });
     const vsixExists = await exists(vsixResultPath);
     assert(vsixExists, 'extension build error');
@@ -127,13 +119,13 @@ describe('vscode-extension', () => {
 
   step('extension tests should pass', async () => {
     try {
-      const extensionDevelopmentPath = path.resolve(relativePath('.'));
+      const extensionDevelopmentPath = path.resolve(relativeToExtension('.'));
 
       const extensionTestsPath = path.resolve(
-        relativePath('out/test'),
+        relativeToExtension('out/test'),
         './index'
       );
-      const testWorkspace = path.resolve(relativePath('src/test'));
+      const testWorkspace = path.resolve(relativeToExtension('src/test'));
 
       await runTests({
         extensionDevelopmentPath,

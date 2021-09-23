@@ -3,8 +3,11 @@ import { createConfigurationObject } from '../vscode-extension-config';
 import * as fs from 'fs/promises';
 import { GeneratingConfiguration, PackageJson } from '../types';
 import { defaultConfig } from '../defaults';
-import JSON5 from 'json5';
-import { validateInputConfig } from '../validate-input-configuration';
+import {
+  InvalidConfigurationError,
+  readGeneratingConfiguration,
+  validateInputConfig,
+} from '../input-configuration-helper';
 type WebpackLogger = ReturnType<Compilation['getLogger']>;
 
 const PLUGIN = 'VSCode Extension Config Generator';
@@ -21,11 +24,16 @@ export class VSCodeExtensionsPackageJsonGenerator {
     if (typeof obj == 'string') {
       this.definitionsFile = obj;
     } else {
-      const validOrError = validateInputConfig(obj);
-      if (validOrError !== true) {
+      try {
+        validateInputConfig(obj);
+      } catch (err) {
         obj.logger.error(`invalid input webpack config object`);
-        obj.logger.error(validOrError);
-        throw new Error('invalid input webpack config object');
+        if (err instanceof InvalidConfigurationError) {
+          obj.logger.error(err.validationErrors);
+        } else {
+          obj.logger.error(err);
+        }
+        throw err;
       }
       this.definitions = { ...defaultConfig, ...obj };
     }
@@ -37,17 +45,18 @@ export class VSCodeExtensionsPackageJsonGenerator {
     if (!obj.definitionsFile) {
       return false;
     }
-    const definitions = JSON5.parse(
-      await fs.readFile(obj.definitionsFile, 'utf8')
-    );
-    const validOrErrors = validateInputConfig(definitions);
-    if (validOrErrors !== true) {
-      obj.logger.error(`error reading definition file ${obj.definitionsFile}`);
-      obj.logger.error(validOrErrors);
+    try {
+      obj.definitions = await readGeneratingConfiguration(obj.definitionsFile);
+      return true;
+    } catch (err) {
+      obj.logger.error(`invalid input webpack config object`);
+      if (err instanceof InvalidConfigurationError) {
+        obj.logger.error(err.validationErrors);
+      } else {
+        obj.logger.error(err);
+      }
       return false;
     }
-    obj.definitions = { ...defaultConfig, ...definitions };
-    return true;
   }
 
   private static async updatePackageJson(
@@ -73,7 +82,7 @@ export class VSCodeExtensionsPackageJsonGenerator {
       );
 
       const packageJson: PackageJson = JSON.parse(
-        await fs.readFile(templateFile ?? targetFile, 'utf8')
+        await fs.readFile(templateFile, 'utf8')
       );
       // make sure contributes.configuration is defined
       if (packageJson.contributes?.configuration === undefined) {
