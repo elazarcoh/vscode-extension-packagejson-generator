@@ -1,0 +1,11 @@
+{
+    "prefix": "conf",
+    "templateFile": "package.no-config.json",
+    "targetFile": "package.json",
+    "configurations": [
+        {
+            "filePath": "./src/config.ts",
+            "name": "Config"
+        }
+    ]
+}
