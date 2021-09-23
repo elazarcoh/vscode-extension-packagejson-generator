@@ -64,7 +64,7 @@ function validator() {
   return validate;
 }
 
-xdescribe('vscode-extension', () => {
+describe('vscode-extension', () => {
   const relativeToExtension = (path: string) => `${extensionPath}/${path}`;
 
   const packageJsonResultPath = relativeToExtension('package.json');
@@ -94,7 +94,7 @@ xdescribe('vscode-extension', () => {
     if (await exists(packageJsonResultPath)) fs.unlink(packageJsonResultPath);
   });
 
-  xstep('should be a valid package.json for extensions', async () => {
+  step('should be a valid package.json for extensions', async () => {
     const validate = validator();
     const valid = validate(packageJson);
     const errors = betterAjvErrors(extensionsSchema, validate.errors, {
