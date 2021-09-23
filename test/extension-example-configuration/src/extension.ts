@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 import { configUtils } from '../../../dist/utils';
 import { Config } from './config';
+import type { View } from './config';
 
-const getConfiguration = configUtils.ConfigurationGetter<Config>('conf');
+const configurations = new configUtils.ConfigurationHandler<Config>('conf');
 
 export function activate(context: vscode.ExtensionContext) {
   // Example: Reading Window scoped configuration
-  const configuredView = getConfiguration('view.showOnWindowOpen');
+  const configuredView = configurations.get('view.showOnWindowOpen');
   switch (configuredView) {
     case 'explorer':
       vscode.commands.executeCommand('workbench.view.explorer');
@@ -30,10 +31,15 @@ export function activate(context: vscode.ExtensionContext) {
     'config.commands.configureViewOnWindowOpen',
     async () => {
       // 1) Getting the value
-      const value = await vscode.window.showQuickPick(
+      const value = (await vscode.window.showQuickPick(
         ['explorer', 'search', 'scm', 'debug', 'extensions'],
         { placeHolder: 'Select the view to show when opening a window.' }
-      );
+      )) as View | undefined;
+
+      if (value === undefined) {
+        // nothing was selected
+        return;
+      }
 
       if (vscode.workspace.workspaceFolders) {
         // 2) Getting the Configuration target
@@ -55,24 +61,21 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (value && target) {
           // 3) Update the configuration value in the target
-          await vscode.workspace
-            .getConfiguration()
-            .update('conf.view.showOnWindowOpen', value, target.target);
-
-          /*
-				// Default is to update in Workspace
-				await vscode.workspace.getConfiguration().update('conf.view.showOnWindowOpen', value);
-				*/
+          await configurations.update(
+            'view.showOnWindowOpen',
+            value,
+            undefined,
+            target.target
+          );
         }
       } else {
         // 2) Update the configuration value in User Setting in case of no workspace folders
-        await vscode.workspace
-          .getConfiguration()
-          .update(
-            'conf.view.showOnWindowOpen',
-            value,
-            vscode.ConfigurationTarget.Global
-          );
+        await configurations.update(
+          'view.showOnWindowOpen',
+          value,
+          undefined,
+          vscode.ConfigurationTarget.Global
+        );
       }
     }
   );
@@ -81,9 +84,10 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidOpenTextDocument((e) => {
       // 1) Get the configured glob pattern value for the current file
-      const value: any = vscode.workspace
-        .getConfiguration('', e.uri)
-        .get('conf.resource.insertEmptyLastLine');
+      const value: any = configurations.get(
+        'resource.insertEmptyLastLine',
+        e.uri
+      );
 
       // 2) Check if the current resource matches the glob pattern
       const matches = value ? value[e.fileName] : undefined;
@@ -104,19 +108,14 @@ export function activate(context: vscode.ExtensionContext) {
       if (vscode.window.activeTextEditor) {
         const currentDocument = vscode.window.activeTextEditor.document;
 
-        // 1) Get the configuration for the current document
-        const configuration = vscode.workspace.getConfiguration(
-          '',
-          currentDocument.uri
-        );
-
-        // 2) Get the configiuration value
-        const currentValue = configuration.get(
-          'conf.resource.insertEmptyLastLine',
+        // 1) Get the configuration value
+        const currentValue = configurations.get(
+          'resource.insertEmptyLastLine',
+          currentDocument.uri,
           {}
         );
 
-        // 3) Choose target to Global when there are no workspace folders
+        // 2) Choose target to Global when there are no workspace folders
         const target = vscode.workspace.workspaceFolders
           ? vscode.ConfigurationTarget.WorkspaceFolder
           : vscode.ConfigurationTarget.Global;
@@ -126,10 +125,11 @@ export function activate(context: vscode.ExtensionContext) {
           ...{ [currentDocument.fileName]: true },
         };
 
-        // 4) Update the configuration
-        await configuration.update(
-          'conf.resource.insertEmptyLastLine',
+        // 3) Update the configuration
+        await configurations.update(
+          'resource.insertEmptyLastLine',
           value,
+          undefined,
           target
         );
       }
@@ -181,33 +181,26 @@ export function activate(context: vscode.ExtensionContext) {
               }
             );
             if (workspaceFolder) {
-              // 4) Get the configuration for the workspace folder
-              const configuration = vscode.workspace.getConfiguration(
-                '',
+              // 4) Get the current value
+              const currentValue = configurations.get(
+                'resource.insertEmptyLastLine',
                 workspaceFolder.uri
-              );
-
-              // 5) Get the current value
-              const currentValue = configuration.get<{}>(
-                'conf.resource.insertEmptyLastLine'
               );
 
               const newValue = { ...currentValue, ...{ [value]: true } };
 
-              // 6) Update the configuration value
-              await configuration.update(
-                'conf.resource.insertEmptyLastLine',
+              // 5) Update the configuration value
+              await configurations.update(
+                'resource.insertEmptyLastLine',
                 newValue,
+                undefined,
                 target.target
               );
             }
           } else {
-            // 3) Get the configuration
-            const configuration = vscode.workspace.getConfiguration();
-
             // 4) Get the current value
-            const currentValue = configuration.get<{}>(
-              'conf.resource.insertEmptyLastLine'
+            const currentValue = configurations.get(
+              'resource.insertEmptyLastLine'
             );
 
             const newValue = {
@@ -216,23 +209,19 @@ export function activate(context: vscode.ExtensionContext) {
             };
 
             // 3) Update the value in the target
-            await vscode.workspace
-              .getConfiguration()
-              .update(
-                'conf.resource.insertEmptyLastLine',
-                newValue,
-                target.target
-              );
+            await configurations.update(
+              'resource.insertEmptyLastLine',
+              newValue,
+              undefined,
+              target.target
+            );
           }
         }
       } else {
         // 2) Get the configuration
-        const configuration = vscode.workspace.getConfiguration();
 
         // 3) Get the current value
-        const currentValue = configuration.get<{}>(
-          'conf.resource.insertEmptyLastLine'
-        );
+        const currentValue = configurations.get('resource.insertEmptyLastLine');
 
         const newValue = {
           ...currentValue,
@@ -240,13 +229,12 @@ export function activate(context: vscode.ExtensionContext) {
         };
 
         // 4) Update the value in the User Settings
-        await vscode.workspace
-          .getConfiguration()
-          .update(
-            'conf.resource.insertEmptyLastLine',
-            newValue,
-            vscode.ConfigurationTarget.Global
-          );
+        await configurations.update(
+          'resource.insertEmptyLastLine',
+          newValue,
+          undefined,
+          vscode.ConfigurationTarget.Global
+        );
       }
     }
   );
@@ -260,9 +248,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       // 1) Check if showing size is configured for current file
-      const showSize: any = vscode.workspace
-        .getConfiguration('', e)
-        .get('conf.language.showSize');
+      const showSize: any = configurations.get('language.showSize', e);
 
       // 3) If matches, insert empty last line
       if (showSize) {
@@ -278,15 +264,19 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       'config.commands.overrideLanguageValue',
       async () => {
-        // 1) Getting the languge id
+        // 1) Getting the language id
         const languageId = await vscode.window.showInputBox({
           placeHolder: 'Enter the language id',
         });
 
         // 2) Update
-        vscode.workspace
-          .getConfiguration('', { languageId: languageId! })
-          .update('conf.language.showSize', true, false, true);
+        configurations.update(
+          'language.showSize',
+          true,
+          { languageId: languageId! },
+          false,
+          true
+        );
       }
     )
   );
@@ -299,9 +289,11 @@ export function activate(context: vscode.ExtensionContext) {
           const currentDocument = vscode.window.activeTextEditor.document;
 
           // 1) Get the configured glob pattern value for the current file
-          const value: any = vscode.workspace
-            .getConfiguration('', currentDocument.uri)
-            .get('conf.resource.insertEmptyLastLine');
+          const value = configurations.get(
+            'resource.insertEmptyLastLine',
+            currentDocument.uri,
+            {}
+          );
 
           // 2) Check if the current resource matches the glob pattern
           const matches = value[currentDocument.fileName];

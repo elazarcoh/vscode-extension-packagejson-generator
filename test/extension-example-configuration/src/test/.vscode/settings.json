@@ -1,0 +1,5 @@
+{
+    "conf.resource.insertEmptyLastLine": {
+        "a.py": true
+    }
+}
