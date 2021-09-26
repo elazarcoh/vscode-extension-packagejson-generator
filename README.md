@@ -95,6 +95,19 @@ export const getConfiguration =
 const e = getConfiguration('enumConfig');
 ```
 
+or as a class
+```ts
+import { configUtils } from 'vscode-extensions-json-generator/utils';
+
+export const configurations = new configUtils.ConfigurationHandler<Config>('myExt');
+
+// get
+const e = configurations.get('enumConfig');
+
+// update
+configurations.update('enumConfig', 'Foo');
+```
+
 ## Config options
 
 ```jsonc
