@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "test\\extension-example-configuration"
+		}
+	],
+	"settings": {
+		"cSpell.enabled": true
+	}
+}

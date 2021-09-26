@@ -12,6 +12,7 @@ export interface ConfigEntry {
 export interface GeneratingConfiguration {
   configurations: ConfigEntry[];
   prefix: string;
+  templateFile?: string;
   targetFile?: string;
   tsconfig?: string;
   tags?: string[];
