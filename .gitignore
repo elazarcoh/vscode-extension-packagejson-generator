@@ -4,3 +4,4 @@ node_modules
 dist
 /bin.js
 .vscode-test/
+test/extension-example-configuration/package.json
