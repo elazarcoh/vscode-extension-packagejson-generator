@@ -2,7 +2,7 @@
   "name": "vscode-extensions-json-generator",
   "author": "elazarcoh",
   "module": "dist/vscode-extensions-json-generator.esm.js",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "license": "MIT",
   "exports": {
     ".": "./dist/index.js",
@@ -24,6 +24,9 @@
   ],
   "engines": {
     "node": ">=14"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   },
   "scripts": {
     "update-package-json": "node ./bin.js",
