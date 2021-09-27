@@ -99,7 +99,7 @@ or as a class
 ```ts
 import { configUtils } from 'vscode-extensions-json-generator/utils';
 
-export const configurations = new configUtils.ConfigurationHandler<Config>('myExt');
+export const configurations = new configUtils.VSCodeConfigurations<Config>('myExt');
 
 // get
 const e = configurations.get('enumConfig');

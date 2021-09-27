@@ -89,7 +89,7 @@ interface IUpdate<C extends { [key: string]: any }> {
   ): Thenable<void>;
 }
 
-export class ConfigurationHandler<C extends { [key: string]: any }>
+export class VSCodeConfigurations<C extends { [key: string]: any }>
   implements IGet<C>, IUpdate<C>, IInspect<C>
 {
   private _get: <K extends keyof C>(

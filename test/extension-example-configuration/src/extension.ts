@@ -3,7 +3,7 @@ import { configUtils } from '../../../dist/utils';
 import { Config } from './config';
 import type { View } from './config';
 
-const configurations = new configUtils.ConfigurationHandler<Config>('conf');
+const configurations = new configUtils.VSCodeConfigurations<Config>('conf');
 
 export function activate(context: vscode.ExtensionContext) {
   // Example: Reading Window scoped configuration

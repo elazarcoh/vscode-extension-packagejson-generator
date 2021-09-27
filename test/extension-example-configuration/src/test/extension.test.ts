@@ -5,14 +5,14 @@ import { configUtils } from '../../../../dist/utils';
 import { Config } from '../config';
 
 suite('Extension Test Suite', () => {
-  let configurations: configUtils.ConfigurationHandler<Config>;
+  let configurations: configUtils.VSCodeConfigurations<Config>;
   const section = 'conf';
   const testFile = (relative: string) => {
     return vscode.Uri.file(`${__dirname}/${relative}`);
   };
 
   suiteSetup(() => {
-    configurations = new configUtils.ConfigurationHandler<Config>(section);
+    configurations = new configUtils.VSCodeConfigurations<Config>(section);
   });
 
   vscode.window.showInformationMessage('Start all tests.');
