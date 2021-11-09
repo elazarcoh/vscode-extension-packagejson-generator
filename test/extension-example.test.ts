@@ -1,4 +1,4 @@
-import betterAjvErrors from '@stoplight/better-ajv-errors';
+import betterAjvErrors, { IOutputError } from 'better-ajv-errors';
 import { runTests } from '@vscode/test-electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
@@ -97,11 +97,8 @@ describe('vscode-extension', () => {
   step('should be a valid package.json for extensions', async () => {
     const validate = validator();
     const valid = validate(packageJson);
-    const errors = betterAjvErrors(extensionsSchema, validate.errors, {
-      propertyPath: [],
-      targetValue: packageJson,
-    });
-    assert(valid, errors.map((e) => e.error).join('\n'));
+    const errors = betterAjvErrors(extensionsSchema, packageJson, validate.errors) as undefined | IOutputError[] ?? [];
+    assert(valid, (typeof errors === 'string' ? [errors] : errors).map((e) => e.error).join('\n'));
   }).timeout(10000);
 
   step('should be able to compile', async () => {

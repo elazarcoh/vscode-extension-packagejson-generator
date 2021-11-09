@@ -1,5 +1,5 @@
 import Ajv from 'ajv';
-import betterAjvErrors, { IOutputError } from '@stoplight/better-ajv-errors';
+import betterAjvErrors, { IOutputError } from 'better-ajv-errors';
 import { createGenerator } from 'ts-json-schema-generator';
 import { GeneratingConfiguration } from './types';
 import * as fs from 'fs/promises';
@@ -71,11 +71,7 @@ export function validateInputConfig(
   if (res) {
     return true;
   } else {
-    throw new InvalidConfigurationError(
-      betterAjvErrors(schema, validate.errors, {
-        propertyPath: [],
-        targetValue: definitions,
-      })
-    );
+    const errors = betterAjvErrors(schema, definitions, validate.errors, { format: 'js' }) ?? [];
+    throw new InvalidConfigurationError(typeof errors === 'string' ? [errors] : errors);
   }
 }

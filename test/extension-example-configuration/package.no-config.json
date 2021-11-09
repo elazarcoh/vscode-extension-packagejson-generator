@@ -49,9 +49,9 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"compile": "webpack build --mode development",
 		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "tsc -watch -p ./"
+		"watch": "webpack watch"
 	},
 	"devDependencies": {
 		"@types/node": "^12.12.0",
