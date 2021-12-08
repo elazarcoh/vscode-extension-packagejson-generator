@@ -2,11 +2,11 @@ import { Compilation, Compiler } from 'webpack';
 import { createConfigurationObject } from '../vscode-extension-config';
 import * as fs from 'fs/promises';
 import { GeneratingConfiguration, PackageJson } from '../types';
-import { defaultConfig } from '../defaults';
 import {
   InvalidConfigurationError,
   readGeneratingConfiguration,
   validateInputConfig,
+  withDefaultConfig,
 } from '../input-configuration-helper';
 type WebpackLogger = ReturnType<Compilation['getLogger']>;
 
@@ -35,7 +35,7 @@ export class VSCodeExtensionsPackageJsonGenerator {
         }
         throw err;
       }
-      this.definitions = { ...defaultConfig, ...obj };
+      this.definitions = withDefaultConfig(obj);
     }
   }
 

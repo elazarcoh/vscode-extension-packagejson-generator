@@ -27,16 +27,7 @@ export class InvalidConfigurationError extends Error {
   }
 }
 
-export async function readGeneratingConfiguration(
-  inputFile: string
-): Promise<Required<GeneratingConfiguration>> {
-  const dirname = path.dirname(inputFile);
-  const relativeToInput = (relativePath: string): string => {
-    return path.resolve(dirname, relativePath);
-  };
-
-  const definitions = JSON5.parse(await fs.readFile(inputFile, 'utf8'));
-  validateInputConfig(definitions);
+export function withDefaultConfig(definitions: GeneratingConfiguration): Required<GeneratingConfiguration> {
 
   const completeConfiguration: Required<GeneratingConfiguration> = {
     ...defaultConfig,
@@ -48,6 +39,32 @@ export async function readGeneratingConfiguration(
         defaultConfig.targetFile,
     },
   };
+  return {
+    ...completeConfiguration,
+    ...{
+      targetFile: completeConfiguration.targetFile,
+      templateFile: completeConfiguration.templateFile,
+      tsconfig: completeConfiguration.tsconfig,
+      configurations: completeConfiguration.configurations.map((c) => ({
+        ...c,
+        filePath: c.filePath,
+      })),
+    },
+  };
+}
+
+export async function readGeneratingConfiguration(
+  inputFile: string
+): Promise<Required<GeneratingConfiguration>> {
+  const dirname = path.dirname(inputFile);
+  const relativeToInput = (relativePath: string): string => {
+    return path.resolve(dirname, relativePath);
+  };
+
+  const definitions = JSON5.parse(await fs.readFile(inputFile, 'utf8'));
+  validateInputConfig(definitions);
+  const completeConfiguration = withDefaultConfig(definitions);
+
   return {
     ...completeConfiguration,
     ...{
