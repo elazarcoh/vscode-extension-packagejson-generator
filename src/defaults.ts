@@ -1,12 +1,25 @@
 import type { GeneratingConfiguration } from './types';
 
 export const DEFAULT_TAGS = [
+  'description',
   'markdownDescription',
+  'default',
   'scope',
-  'patternErrorMessage',
-  'deprecationMessage',
   'enumDescriptions',
+  'deprecationMessage',
+  'markdownDeprecationMessage',
   'deprecated',
+  'order',
+  'minimum',
+  'maximum',
+  'maxLength',
+  'minLength',
+  'pattern',
+  'patternErrorMessage',
+  'format',
+  'maxItems',
+  'minItems',
+  'editPresentation',
 ];
 
 export const defaultConfig: Omit<
