@@ -28,7 +28,7 @@ export interface Config {
 ### As cli tool
 
 ```bash
-update-package-json --file 'vscode-extension-config.json'
+update-package-json ts2pjs 'vscode-extension-config.json'
 ```
 
 The input JSON file may look like this:
@@ -138,4 +138,28 @@ configurations.update('enumConfig', 'Foo');
   "tsconfig": "tsconfig.ts",
   "sort": true
 }
+```
+
+## Convert from existing `package.json` to TypeScript interface
+
+Use the cli tool with `pjs2ts`.
+
+```bash
+update-package-json pjs2ts 'package.json' -p conf --add-config-class
+```
+
+Options:
+
+```bash
+Convert the package.json `contributes.configurations` to a TypeScript file     
+
+Arguments:
+  inputFile                   input package.json file (default: "package.json")
+
+Options:
+  -p, --prefix [prefix]       prefix for the configuration
+  -o, --output [outputFile]   output file (default: "config.ts")
+  --add-config-class
+  --config-class-name [name]  name of the configuration class (default: "Configuration")
+  -h, --help                  display help for command
 ```

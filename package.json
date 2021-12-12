@@ -75,6 +75,7 @@
     "better-ajv-errors": "^0.8.2",
     "commander": "^8.1.0",
     "deep-equal": "^2.0.5",
+    "json-schema-to-typescript": "git://github.com/elazarcoh/json-schema-to-typescript",
     "json5": "^2.2.0",
     "ts-json-schema-generator": "^0.95.0"
   },
