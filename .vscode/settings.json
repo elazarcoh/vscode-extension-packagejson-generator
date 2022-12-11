@@ -2,8 +2,5 @@
     "prettier.enable": true,
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "modificationsIfAvailable",
-    "cSpell.enabled": true,
-    "cSpell.words": [
-        "vsix"
-    ],
+    "cSpell.enabled": true
 }
