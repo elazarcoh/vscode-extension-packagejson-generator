@@ -2,5 +2,8 @@
     "prettier.enable": true,
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "modificationsIfAvailable",
-    "cSpell.enabled": true
+    "cSpell.enabled": true,
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ]
 }
