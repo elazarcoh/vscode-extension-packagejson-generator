@@ -76,7 +76,7 @@
     "commander": "^8.1.0",
     "deep-equal": "^2.0.5",
     "json-schema-to-typescript": "git://github.com/elazarcoh/json-schema-to-typescript",
-    "json5": "^2.2.0",
+    "json5": "^2.2.2",
     "ts-json-schema-generator": "^0.95.0"
   },
   "peerDependencies": {
