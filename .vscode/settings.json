@@ -3,7 +3,7 @@
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "modificationsIfAvailable",
     "cSpell.enabled": true,
-    "cSpell.words": [
-        "vsix"
-    ],
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ]
 }
