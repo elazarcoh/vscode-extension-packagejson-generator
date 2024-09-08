@@ -7,7 +7,7 @@ import {
 } from './input-configuration-helper';
 import { DEFAULT_TAGS } from "./defaults";
 import { createConfigurationObject } from './vscode-extension-config';
-import { compile } from 'json-schema-to-typescript'
+import { compile } from 'json-schema-to-typescript';
 
 async function ts2pjs(inputFile: string): Promise<void> {
   console.info(`reading input from "${inputFile}"`);
