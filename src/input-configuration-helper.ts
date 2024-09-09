@@ -8,14 +8,65 @@ import { JSONSchema7 } from 'json-schema';
 import { defaultConfig } from './defaults';
 import path from 'path';
 
-const type = 'GeneratingConfiguration';
-const generator = createGenerator({
-  path: `${__dirname}/types.d.ts`,
-  type: type,
-  jsDoc: 'none',
-  extraTags: undefined,
-});
-const schema: JSONSchema7 = generator.createSchema(type);
+const schema: JSONSchema7 = {
+  "$ref": "#/definitions/GeneratingConfiguration",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ConfigEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "filePath": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "filePath",
+        "name"
+      ],
+      "type": "object"
+    },
+    "GeneratingConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "configurations": {
+          "items": {
+            "$ref": "#/definitions/ConfigEntry"
+          },
+          "type": "array"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "sort": {
+          "type": "boolean"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "targetFile": {
+          "type": "string"
+        },
+        "templateFile": {
+          "type": "string"
+        },
+        "tsconfig": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "configurations",
+        "prefix"
+      ],
+      "type": "object"
+    }
+  }
+}
 // @ts-expect-error. set minItems for stuff that ts can't see
 schema.definitions.GeneratingConfiguration.properties.configurations.minItems = 1;
 

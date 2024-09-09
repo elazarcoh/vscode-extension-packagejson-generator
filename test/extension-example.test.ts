@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import Ajv from 'ajv';
 import assert from 'assert';
-import { createVSIX } from 'vsce';
+import { createVSIX } from '@vscode/vsce';
 import type { JSONSchema7 } from 'json-schema';
 import type { GeneratingConfiguration, PackageJson } from '../src/types';
 import { createConfigurationObject } from '../src/vscode-extension-config';

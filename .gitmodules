@@ -1,0 +1,3 @@
+[submodule "submodules/json-schema-to-typescript"]
+	path = submodules/json-schema-to-typescript
+	url = https://github.com/elazarcoh/json-schema-to-typescript.git

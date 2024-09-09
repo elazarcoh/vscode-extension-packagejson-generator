@@ -12,6 +12,9 @@
     ".": "./dist/index.js",
     "./*": "./dist/*/index.js"
   },
+  "workspaces": [
+    "submodules/*"
+  ],
   "bin": {
     "update-package-json": "./bin.js"
   },
@@ -35,12 +38,11 @@
   "scripts": {
     "update-package-json": "node ./bin.js",
     "build-production": "yarn run clean-build",
-    "build": "tsc -p .",
+    "build": "esbuild src/index.ts src/utils/index.ts src/webpack/index.ts --external:vscode --bundle --platform=node --outdir=dist && tsc --emitDeclarationOnly --outDir dist",
     "clean-build": "yarn run clean && yarn run build",
     "clean": "rimraf out dist coverage ./test/extension-example-configuration/out",
     "lint": "eslint \"src/**/*.ts\" \"*.js\"",
-    "test": "mocha",
-    "watch": "tsc -p . --watch"
+    "test": "mocha"
   },
   "prettier": {
     "printWidth": 80,
@@ -58,16 +60,22 @@
     "@types/node": "^16.7.10",
     "@types/vscode": "^1.60.0",
     "@types/webpack": "^5.28.0",
-    "@vscode/test-electron": "^1.6.2",
+    "@typescript-eslint/eslint-plugin": "^8.4.0",
+    "@typescript-eslint/parser": "^8.4.0",
+    "@vscode/test-electron": "^2.4.1",
     "@vscode/vsce": "^3.1.0",
+    "esbuild": "^0.23.1",
+    "eslint": "^9.10.0",
     "glob": "^7.1.7",
+    "install-peers": "^1.0.4",
     "mocha": "^9.1.1",
     "mocha-steps": "^1.3.0",
     "mocha-suppress-logs": "^0.3.1",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.2.1",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.2",
+    "typescript": "^5.5.4",
+    "webpack": "^5.94.0",
     "webpack-cli": "^4.9.1"
   },
   "dependencies": {
@@ -75,11 +83,8 @@
     "better-ajv-errors": "^0.8.2",
     "commander": "^8.1.0",
     "deep-equal": "^2.0.5",
-    "json-schema-to-typescript": "git+https://github.com/elazarcoh/json-schema-to-typescript.git#24325c9548b2bff2de5d54bd50e1045dbfbdc5bc",
     "json5": "^2.2.2",
-    "ts-json-schema-generator": "^0.95.0"
+    "ts-json-schema-generator": "^2.3.0"
   },
-  "peerDependencies": {
-    "webpack": "^5.52.1"
-  }
+  "packageManager": "yarn@4.4.1"
 }

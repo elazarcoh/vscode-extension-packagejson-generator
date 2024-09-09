@@ -15,7 +15,7 @@ const config = {
 
   entry: absolute('./src/extension.ts'),
   output: {
-    path: absolute('out'),
+    path: absolute('dist'),
     filename: 'extension.js',
     libraryTarget: 'commonjs2',
     devtoolModuleFilenameTemplate: '../[resource-path]',

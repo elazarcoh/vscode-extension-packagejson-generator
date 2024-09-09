@@ -81,6 +81,7 @@ export function createConfigurationObject(
           path: c.filePath,
           extraTags: tags,
           tsconfig: tsconfig,
+          skipTypeCheck: true,
         }).createSchema(c.name).properties
     )
     .filter((d): d is { [key: string]: JSONSchema7Definition } => {

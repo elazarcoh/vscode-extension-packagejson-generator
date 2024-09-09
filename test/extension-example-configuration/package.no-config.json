@@ -48,10 +48,11 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
+		"vscode:prepublish": "npm run build",
 		"compile": "webpack build --mode development",
 		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "webpack watch"
+		"watch": "webpack watch",
+		"build": "tsc -p ./"
 	},
 	"devDependencies": {
 		"@types/node": "^12.12.0",
@@ -59,8 +60,8 @@
 		"@typescript-eslint/eslint-plugin": "^4.16.0",
 		"@typescript-eslint/parser": "^4.16.0",
 		"eslint": "^7.21.0",
-		"typescript": "^4.3.5",
-		"webpack": "^5.53.0",
+		"typescript": "^5.5.4",
+		"webpack": "^5.94.0",
 		"webpack-cli": "^4.8.0",
 		"ts-loader": "^9.2.5"
 	}
