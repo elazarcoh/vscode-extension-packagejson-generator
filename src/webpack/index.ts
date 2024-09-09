@@ -112,6 +112,9 @@ export class VSCodeExtensionsPackageJsonGenerator {
 
     const updateDefinitions = async () => {
       try {
+        if (!thisObj.definitions) {
+          await VSCodeExtensionsPackageJsonGenerator.readDefinitions(thisObj);
+        }
         thisObj.needsUpdate = !compiler.options.watch ||
           await VSCodeExtensionsPackageJsonGenerator.readDefinitions(thisObj);
         await updatePackageJson();

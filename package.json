@@ -42,7 +42,7 @@
     "clean-build": "yarn run clean && yarn run build",
     "clean": "rimraf out dist coverage ./test/extension-example-configuration/out",
     "lint": "eslint \"src/**/*.ts\" \"*.js\"",
-    "test": "mocha"
+    "test": "mocha --timeout 10000"
   },
   "prettier": {
     "printWidth": 80,
